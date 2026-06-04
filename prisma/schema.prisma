@@ -1,9 +1,13 @@
+// prisma/schema.prisma
+// En Prisma v7 la URL ya NO va aquí — va en prisma.config.ts
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  // url se quitó en Prisma v7 — se configura en prisma.config.ts
 }
 
 model Task {

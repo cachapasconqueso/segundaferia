@@ -1,50 +1,53 @@
 // src/task/task.service.ts
+// Lógica CRUD de tareas usando PrismaService inyectado por NestJS
+
 import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PrismaClient } from '@prisma/client';
-
-// Instanciamos Prisma para conectarnos a la base de datos
-const prisma = new PrismaClient();
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TaskService {
-  
+  // NestJS inyecta PrismaService automáticamente aquí
+  constructor(private prisma: PrismaService) {}
+
   // C - CREATE (Crear tarea)
   create(createTaskDto: CreateTaskDto) {
-    return prisma.task.create({
+    return this.prisma.task.create({
       data: {
         title: createTaskDto.title,
         priority: createTaskDto.priority,
-        // completed es false por defecto, así lo definimos en el schema
+        // completed es false por defecto según el schema
       },
     });
   }
 
   // R - READ (Leer todas las tareas)
   findAll() {
-    return prisma.task.findMany();
+    return this.prisma.task.findMany({
+      orderBy: { createdAt: 'desc' }, // más recientes primero
+    });
   }
 
   // R - READ (Leer una sola tarea)
   findOne(id: number) {
-    return prisma.task.findUnique({
-      where: { id: id },
+    return this.prisma.task.findUnique({
+      where: { id },
     });
   }
 
-  // U - UPDATE (Actualizar tarea, ej: marcar como completada)
+  // U - UPDATE (Actualizar tarea: título, prioridad o completada)
   update(id: number, updateTaskDto: UpdateTaskDto) {
-    return prisma.task.update({
-      where: { id: id },
+    return this.prisma.task.update({
+      where: { id },
       data: updateTaskDto,
     });
   }
 
   // D - DELETE (Borrar tarea)
   remove(id: number) {
-    return prisma.task.delete({
-      where: { id: id },
+    return this.prisma.task.delete({
+      where: { id },
     });
   }
 }
